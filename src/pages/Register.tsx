@@ -1,24 +1,45 @@
 import React, {useContext, useEffect, useState} from "react";
 import {SelectedDateContext} from "../context/SelectedDateContext.tsx";
-
-
-
-const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-};
+import api from '../lib/api.ts';
+import {useNavigate} from "react-router-dom";
 
 
 const Register : React.FC = ()  => {
     const {selectedDate} = useContext(SelectedDateContext);
-
     const [category, setCategory] = useState("");
     const [amount, setAmount] = useState('');
-    const [description, setDescription] = useState('');
+    const [content, setContent] = useState('');
+    const navigator = useNavigate();
 
     useEffect(() => {
         console.log("Register.tsx", );
     }, []);
+
+
+    const handleSubmit = async (e : React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const param = {
+            category,
+            content,
+            amount : Number(amount),
+            owner_type : 'USER',
+            occurred_dt : selectedDate.format('YYYYMMDD'),
+        };
+
+        try{
+            const response = await api.post('/account/register', param);
+            console.log(response.data);
+            alert("성공했습니다.");
+            navigator('/');
+        }
+        catch (error){
+            console.log(error);
+            throw error;
+        }
+
+
+    };
 
 
     return (
@@ -57,8 +78,8 @@ const Register : React.FC = ()  => {
                     <input
                         type="text"
                         className="w-full border rounded px-3 py-2"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
                         maxLength={50}
                     />
                 </div>
